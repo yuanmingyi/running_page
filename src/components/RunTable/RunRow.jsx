@@ -3,7 +3,7 @@ import { MAIN_COLOR } from 'src/utils/const';
 import { formatPace, titleForRun, formatRunTime  } from 'src/utils/utils';
 import styles from './style.module.scss';
 
-const RunRow = ({ runs, run, locateActivity, runIndex, setRunIndex }) => {
+const RunRow = ({ run, eleIndex, locateActivity, runIndex, setRunIndex }) => {
   const distance = (run.distance / 1000.0).toFixed(1);
   const pace = run.average_speed;
 
@@ -14,15 +14,14 @@ const RunRow = ({ runs, run, locateActivity, runIndex, setRunIndex }) => {
   const runTime = formatRunTime(distance,pace);
 
   // change click color
-  const handleClick = (e, runs, run) => {
-    const elementIndex = runs.indexOf(run);
+  const handleClick = (e, eleIndex) => {
     e.target.parentElement.style.color = 'red';
 
     const elements = document.getElementsByClassName(styles.runRow);
-    if (runIndex !== -1 && elementIndex !== runIndex) {
+    if (runIndex !== -1 && eleIndex !== runIndex) {
       elements[runIndex].style.color = MAIN_COLOR;
     }
-    setRunIndex(elementIndex);
+    setRunIndex(eleIndex);
   };
 
   return (
@@ -30,7 +29,7 @@ const RunRow = ({ runs, run, locateActivity, runIndex, setRunIndex }) => {
       className={styles.runRow}
       key={run.start_date_local}
       onClick={(e) => {
-        handleClick(e, runs, run);
+        handleClick(e, eleIndex);
         locateActivity(run);
       }}
     >

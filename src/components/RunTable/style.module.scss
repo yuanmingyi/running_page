@@ -37,6 +37,30 @@
   overflow-x: scroll;
 }
 
+.monthContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.monthLink {
+  color: #fff
+}
+
+.statContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: 10px;
+}
+
+.statContainer div {
+  margin-right: 10px;
+}
+
 .runDate {
   color: $light;
 }

@@ -28,7 +28,7 @@ const formatPace = (d) => {
   return `${minutes}'${seconds.toFixed(0).toString().padStart(2, '0')}"`;
 };
 
-const formatRunTime = (distance,pace) => {
+const formatRunTime = (distance,pace,unit='min') => {
   if (Number.isNaN(distance) || Number.isNaN(pace)) {
     return '0min';
   }
@@ -38,7 +38,7 @@ const formatRunTime = (distance,pace) => {
     const seconds = Math.floor((formatPace * distance - minutes) * 60.0);
     return seconds + 's';
   }
-  return minutes + 'min';
+  return minutes + unit;
 };
 
 // for scroll to the map
