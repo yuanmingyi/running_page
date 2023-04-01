@@ -74,6 +74,7 @@ const Index = () => {
   };
 
   const locateActivity = (run) => {
+    console.info(run);
     setGeoData(geoJsonForRuns([run]));
     setTitle(titleForShow(run));
     clearInterval(intervalId);

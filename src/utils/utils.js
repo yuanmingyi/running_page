@@ -7,7 +7,7 @@ import { MUNICIPALITY_CITIES_ARR, NEED_FIX_MAP, RUN_TITLES } from './const';
 
 const titleForShow = (run) => {
   const date = run.start_date_local.slice(0, 11);
-  const distance = (run.distance / 1000.0).toFixed(1);
+  const distance = (run.distance / 1000.0).toFixed(3);
   let name = 'Run';
   if (run.name.slice(0, 7) === 'Running') {
     name = 'run';
@@ -28,17 +28,25 @@ const formatPace = (d) => {
   return `${minutes}'${seconds.toFixed(0).toString().padStart(2, '0')}"`;
 };
 
-const formatRunTime = (distance,pace,unit='min') => {
+const formatRunTime = (distance,pace) => {
   if (Number.isNaN(distance) || Number.isNaN(pace)) {
-    return '0min';
+    return '0分钟';
   }
+
   const formatPace = (1000.0 / 60.0) * (1.0 / pace);
   const minutes = Math.floor(formatPace * distance);
   if (minutes === 0) {
-    const seconds = Math.floor((formatPace * distance - minutes) * 60.0);
-    return seconds + 's';
+    const seconds = Math.floor(formatPace * distance * 60.0);
+    return seconds + '秒';
   }
-  return minutes + unit;
+
+  const hours = Math.floor(minutes / 60.0);
+  const remains = minutes % 60;
+  if (hours === 0) {
+    return minutes + '分钟';
+  }
+
+  return hours + '小时' + remains + '分钟';
 };
 
 // for scroll to the map

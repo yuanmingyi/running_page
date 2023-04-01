@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MAIN_COLOR } from 'src/utils/const';
-import { formatRunTime, sortDateFunc, sortDateFuncReverse } from 'src/utils/utils';
-import { formatPace } from '../../utils/utils';
+import { formatPace, formatRunTime, sortDateFunc, sortDateFuncReverse } from 'src/utils/utils';
 import RunRow from './RunRow';
 import styles from './style.module.scss';
 
@@ -19,7 +18,7 @@ const RunTable = ({
   const [runsInMonth, setRunsInMonth] = useState([]);
   const [statData, setStatData] = useState({});
 
-  const formatDistance = (dist, unit=0) => (dist / 1000.0).toFixed(1) + unit;
+  const formatDistance = (dist) => (dist / 1000.0).toFixed(3);
 
   useEffect(() => {
     onMonthChange(null, month);
@@ -32,10 +31,18 @@ const RunTable = ({
 
     let stat = {
       total: _runsInMonth.length,
-      distance: formatDistance(_runsInMonth.reduce((pr, v) => pr + v.distance, 0)),
-      duration: _runsInMonth.reduce((pr,v) => pr + formatRunTime(formatDistance(v.distance), v.average_speed, 0), 0),
+      // distance'unit = meter
+      distance: _runsInMonth.reduce((pr, v) => pr + v.distance, 0),
+      // duration'unit = second
+      duration: _runsInMonth.reduce((pr,v) => pr + v.distance / v.average_speed, 0),
     };
-    stat.pace = formatPace(stat.distance < 0.1 ? 0 : (stat.distance * 1000) / (stat.duration * 60));
+    stat.speed = stat.distance / stat.duration;
+    stat.runDays = _runsInMonth.map(r => r.start_date_local.split(" ")[0]).filter((v, idx, arr) => arr.indexOf(v) === idx).length;
+    const totalHb = _runsInMonth.filter(r => !!r.average_heartrate).reduce((pr, v) => pr + v.average_heartrate * v.distance / v.average_speed, 0);
+    const totalHbDuration = _runsInMonth.filter(r => !!r.average_heartrate).reduce((pr, v) => pr + v.distance / v.average_speed, 0);
+    stat.hb = totalHb / totalHbDuration;
+    stat.distance = formatDistance(stat.distance);
+
     document.getElementsByClassName(styles.monthLink)[month].style.color = MAIN_COLOR;
     if (e) {
       e.target.style.color = 'red';
@@ -61,8 +68,8 @@ const RunTable = ({
       || Number.isNaN(a.average_speed) || Number.isNaN(b.average_speed)) {
       return 0;
     }
-    const aDistance = (a.distance / 1000.0).toFixed(1);
-    const bDistance = (b.distance / 1000.0).toFixed(1);
+    const aDistance = (a.distance / 1000.0).toFixed(3);
+    const bDistance = (b.distance / 1000.0).toFixed(3);
     const aPace = (1000.0 / 60.0) * (1.0 / a.average_speed);
     const bPace = (1000.0 / 60.0) * (1.0 / b.average_speed);
     if (sortFuncInfo === 'Time') {
@@ -108,10 +115,13 @@ const RunTable = ({
         ))}
       </div>
       <div className={styles.statContainer}>
-        <div>runs:{statData.total}</div>
-        <div>distance:{statData.distance}km</div>
-        <div>duration:{statData.duration}min</div>
-        <div>pace:{statData.pace}/km</div>
+        <div>次数: {statData.total}</div>
+        <div>天数: {statData.runDays}</div>
+        <div>距离: {statData.distance}km</div>
+        <div>时间: {formatRunTime(statData.distance, statData.speed)}</div>
+        <div>配速: {formatPace(statData.speed)}/km</div>
+        {!isNaN(statData.hb) &&
+        <div>心率: {Math.round(statData.hb)}bpm</div>}
       </div>
       <table className={styles.runTable} cellSpacing="0" cellPadding="0">
         <thead>
